@@ -10,6 +10,7 @@
         <meta name=theme-color content=>
         <meta name=msapplication-TileColor content=>
         <title>携帯基地局検索用サイト</title>
+        <?php require_once('get-data.php');?>
     </head>
     <body>
         <header>
@@ -19,7 +20,7 @@
         <main>
             <section>
                 <h2>条件指定</h2>
-                <form id=term action=get-data.php method=post>
+                <form id=term action=index.php method=post>
                     <select form=term name=Band>
                         <option value=none selected>選択なし</option>
                         <option value=1>Band 1</option>

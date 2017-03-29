@@ -1,5 +1,5 @@
 <?php
-function sanitze_band($band){
+function sanitize_band($band){
     switch($band){
         case '1':
         $FF = '';
@@ -75,8 +75,8 @@ function get_queri(){
         $HV = $citie;
     }*/
     if($band==='none'){
-        $FF = ;
-        $TF = ;
+        $FF = '';
+        $TF = '';
     }else{
         $band = sanitize_band($band);
         $FF   = '&FF=' . $band['FF'];
@@ -85,14 +85,13 @@ function get_queri(){
     return'OW=FB+0&MK=CCC&HZ=3&SelectID=5&DC=500&SK=4&pageID=3&CONFIRM=1' . $HC . $HV . $FF . $TF;
 }
 function get_data(){
-    use Goutte\Client;
-    $html    = '';
-    $queri   = get_queri();
-    $client  = new Client();
-    $number  = $client->request('GET','http://www.tele.soumu.go.jp/musen/SearchServlet?' . $queri . '&SC=1#result')->fiter('#temp1 > form > table')->first()->fiter('tbody > tr > td')->last()->text();
-    $number  = str_replace('検索結果件数  1 ～ 500 / ','',$number);
-    $number  = intval($number);
-    $surplus = $number % 500;
+    require_once('phpQuery-onefile.php');
+    $html     = '';
+    $url_base = 'http://www.tele.soumu.go.jp/musen/SearchServlet?' . get_queri();
+    $number   = phpQuery::newDocumentFile($url_base . '&SC=1#result')->fiter('#temp1 > form > table')->first()->fiter('tbody > tr > td')->last()->text();
+    $number   = str_replace('検索結果件数  1 ～ 500 / ','',$number);
+    $number   = intval($number);
+    $surplus  = $number % 500;
     if($surplus!==0){
         $surplus = 1;
     }
@@ -102,11 +101,11 @@ function get_data(){
             $page = '&SC=1';
         }else{
             $page_now = $i - 1;
-            $page_now = $page_now * 5
-            $page     = '&SC=' . $page_now . '01'
+            $page_now = $page_now * 5;
+            $page     = '&SC=' . $page_now . '01';
         }
-        $url   = 'http://www.tele.soumu.go.jp/musen/SearchServlet?' . $queri . $page . '#result';
-        $html .= '<table>' . $client->request('GET',$url)->fiter('#temp1 > form > table.borderstyle')->text() . '</table>';
+        $url   = $url_base . $page . '#result';
+        $html .= '<table>' . phpQuery::newDocumentFile($url)->fiter('#temp1 > form > table.borderstyle')->text() . '</table>';
     }
     echo $html;
 }
