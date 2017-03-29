@@ -10,7 +10,148 @@
         <meta name=theme-color content=>
         <meta name=msapplication-TileColor content=>
         <title>携帯基地局検索用サイト</title>
-        <?php require_once('get-data.php');?>
+        <?php
+        function sanitize_band($band){
+            switch($band){
+                case '1':
+                $FF = '';
+                $TF = '';
+                break;
+                case '3':
+                $FF = '';
+                $TF = '';
+                break;
+                case '8':
+                $FF = '';
+                $TF = '';
+                break;
+                case '11':
+                $FF = '';
+                $TF = '';
+                break;
+                case '18':
+                $FF = '';
+                $TF = '';
+                break;
+                case '19':
+                $FF = '';
+                $TF = '';
+                break;
+                case '21':
+                $FF = '';
+                $TF = '';
+                break;
+                case '28':
+                $FF = '';
+                $TF = '';
+                break;
+                case 'UQ':
+                $FF = '';
+                $TF = '';
+                break;
+                case 'UQ2':
+                $FF = '';
+                $TF = '';
+                break;
+                case 'WCP':
+                $FF = '';
+                $TF = '';
+                break;
+                case 'BWA':
+                $FF = '';
+                $TF = '';
+                break;
+                case '42':
+                $FF = '';
+                $TF = '';
+                break;
+                default:
+                $FF = '';
+                $TF = '';
+                break;
+            }
+            return array('FF'=>$FF,'TF'=>$TF);
+        }
+        function get_queri(){
+            $HC = '';
+            $HV = '';
+            $FF = '';
+            $TF = '';
+            /*$prefecture = $_POST['prefecture'];
+            //$citie      = $_POST['citie'];
+            $band       = $_POST['Band'];
+            if($prefecture==='none'){
+                $HC = '';
+            }else{
+                $HC = $prefecture;
+            }
+            if($citie==='none'){
+                $HV = '';
+            }else{
+                $HV = $citie;
+            }
+            if($band==='none'){
+                $FF = '';
+                $TF = '';
+            }else{
+                $band = sanitize_band($band);
+                $FF   = '&FF=' . $band['FF'];
+                $TF   = '&TF=' . $band['TF'];
+            }*/
+            return'OW=FB+0&MK=CCC&HZ=3&SelectID=5&DC=500&SK=4&pageID=3&CONFIRM=1' . $HC . $HV . $FF . $TF;
+        }
+        function search_number($url_base){
+            $ch     = curl_init($url_base . '&SC=1#result');
+            $fp     = fopen($url_base . '&SC=1#result','r');
+            curl_setopt($ch,CURLOPT_FILE,$number);
+            curl_setopt($ch,CURLOPT_HEADER,0);
+            curl_exec($ch);
+            curl_close($ch);
+            fclose($fp);
+            $number  = mb_convert_encoding($number,'UTF-8','Shift_JIS');
+            $number  = preg_match_all('/<div id="#temp1">.*?<\/div>/',$number);
+            $number  = preg_match_all('/<form name="result">.*?<\/form>/',$number[0][0]);
+            $number  = preg_match_all('/<table width="95%" border="0">.*?<\/table>/',$number[0][0]);
+            $number  = preg_match_all('/<tbody>.*?<\/tbody>/',$number[0][0]);
+            $number  = preg_match_all('/<tr>.*?<\/tr>/',$number[0][0]);
+            $number  = preg_match_all('/<td align="right">.*?<\/td>/',$number[0][0],$number);
+            $number  = str_replace('検索結果件数  1 ～ 500 / ','',$number[0][0]);
+            $number  = intval($number);
+            $surplus = $number % 500;
+            if($surplus!==0){
+                $surplus = 1;
+            }
+            $number = $number / 500 + $surplus;
+            return $number;
+        }
+        function get_data(){
+            $url_base = 'http://www.tele.soumu.go.jp/musen/SearchServlet?' . get_queri();
+            $number   = search_number($url_base);
+            for($i = 0;$i < $number; $i++){
+                if($i===0){
+                    $page = '&SC=1';
+                }else{
+                    $page_now = $i - 1;
+                    $page_now = $page_now * 5;
+                    $page     = '&SC=' . $page_now . '01';
+                }
+                $url = $url_base . $page . '#result';
+                $src = file_get_contents($url);
+                $ch_ = curl_init($url);
+                $fp_ = fopen($url,'r');
+                curl_setopt($ch_,CURLOPT_FILE,$src);
+                curl_setopt($ch_,CURLOPT_HEADER,0);
+                curl_exec($ch_);
+                curl_close($ch_);
+                fclose($fp_);
+                $src = mb_convert_encoding($src,'UTF-8','Shift_JIS');
+                $src = preg_match_all('/<div id="#temp1">.*?<\/div>/',$src);
+                $src = preg_match_all('/<form name="result">.*?<\/form>/',$src[0][0]);
+                $src = preg_match_all('/<table class="borderstyle" width="100%" cellspacing="0" cellpadding="3" border="1">.*?<\/table>/',$src[0][0]);
+                echo '<table>' . $src[0][0] . '</table>';
+            }
+        }
+        ?>
     </head>
     <body>
         <header>
