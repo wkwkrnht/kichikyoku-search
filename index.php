@@ -6,9 +6,9 @@
         <meta name=referrer content=default>
         <meta name=renderer content=webkit>
         <meta name=HandheldFriendly content=true>
-        <meta name=description content=>
-        <meta name=theme-color content=>
-        <meta name=msapplication-TileColor content=>
+        <meta name=description content=移動体通信用基地局の検索用サイトです>
+        <meta name=theme-color content=##ffcc00>
+        <meta name=msapplication-TileColor content=#ffcc00>
         <title>携帯基地局検索用サイト</title>
         <?php
         function sanitize_band($band){
@@ -78,7 +78,7 @@
             $FF = '';
             $TF = '';
             /*$prefecture = $_POST['prefecture'];
-            //$citie      = $_POST['citie'];
+            $citie      = $_POST['citie'];
             $band       = $_POST['Band'];
             if($prefecture==='none'){
                 $HC = '';
@@ -108,13 +108,13 @@
             curl_exec($ch);
             curl_close($ch);
             fclose($fp);
-            $number  = mb_convert_encoding($number,'UTF-8','Shift_JIS');
+            $number  = mb_convert_variables("UTF-8","SJIS, SJIS-win, sjis, sjis-win",$number);
             $number  = preg_match_all('/<div id="#temp1">.*?<\/div>/',$number);
             $number  = preg_match_all('/<form name="result">.*?<\/form>/',$number[0][0]);
             $number  = preg_match_all('/<table width="95%" border="0">.*?<\/table>/',$number[0][0]);
             $number  = preg_match_all('/<tbody>.*?<\/tbody>/',$number[0][0]);
             $number  = preg_match_all('/<tr>.*?<\/tr>/',$number[0][0]);
-            $number  = preg_match_all('/<td align="right">.*?<\/td>/',$number[0][0],$number);
+            $number  = preg_match_all('/<td align="right">.*?<\/td>/',$number[0][0]);
             $number  = str_replace('検索結果件数  1 ～ 500 / ','',$number[0][0]);
             $number  = intval($number);
             $surplus = $number % 500;
@@ -127,7 +127,7 @@
         function get_data(){
             $url_base = 'http://www.tele.soumu.go.jp/musen/SearchServlet?' . get_queri();
             $number   = search_number($url_base);
-            for($i = 0;$i < $number; $i++){
+            for($i = 0; $i < $number; $i++){
                 if($i===0){
                     $page = '&SC=1';
                 }else{
@@ -144,11 +144,11 @@
                 curl_exec($ch_);
                 curl_close($ch_);
                 fclose($fp_);
-                $src = mb_convert_encoding($src,'UTF-8','Shift_JIS');
+                $src = mb_convert_variables("UTF-8","SJIS, SJIS-win, sjis, sjis-win",$src);
                 $src = preg_match_all('/<div id="#temp1">.*?<\/div>/',$src);
                 $src = preg_match_all('/<form name="result">.*?<\/form>/',$src[0][0]);
                 $src = preg_match_all('/<table class="borderstyle" width="100%" cellspacing="0" cellpadding="3" border="1">.*?<\/table>/',$src[0][0]);
-                echo '<table>' . $src[0][0] . '</table>';
+                echo'<table>' . $src[0][0] . '</table>';
             }
         }
         ?>
